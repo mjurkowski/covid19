@@ -1,0 +1,15 @@
+.list-group-item.active {
+  color: #495057;
+  background-color: #eeeeee;
+  border: 1px solid rgba(0,0,0,.125);
+}
+
+.color-circle {
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  border-radius: 50%;
+  background-color: red;
+}
