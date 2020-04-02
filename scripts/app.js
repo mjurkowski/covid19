@@ -47,7 +47,7 @@ class App {
       fetch('./time_series_covid19_deaths_global.csv')
         .then(response => response.text())
         .then(csv)
-    ]).then(([submissions, globalDeaths]) => {
+    ]).then(([submissions, rawGlobalDeaths]) => {
       return Promise.all(
         Object.keys(submissions).map(key =>
           fetch(`./predictions_challenge/${key}/predictions.csv`)
@@ -60,16 +60,33 @@ class App {
           submissions[key].predictions = responses[index].splice(1);
         });
 
+        const globalDeaths = rawGlobalDeaths.reduce((acc, row, index) => {
+          if (index === 0) {
+            acc.dates = row.slice(3).map(c => new Date(c))
+          } else {
+            let place = row[0];
+            if (place === 'WORLD') {
+              place = 'World';
+            }
+
+            let data = row.slice(3).map(c => parseFloat(c));
+
+            if (acc[place]) {
+              acc[place] = acc[place].map((v, i) => v + (data[i] || 0))
+            } else {
+              acc[place] = data;
+            }
+          }
+
+          return acc;
+        }, {})
+
         return {
           submissions,
-          globalDeaths: globalDeaths.map(r =>
-            r[0] === 'WORLD' ? ['World', ...r.slice(1)] : r
-          ),
-          places: globalDeaths
-            .map(r => (r[0] === 'WORLD' ? 'World' : r[0]))
-            .slice(1)
+          globalDeaths,
+          places: Object.keys(globalDeaths)
             .sort()
-            .filter((r, index, arr) => arr.indexOf(r) === index)
+            .filter(r => r !== 'dates')
         };
       });
     });
@@ -121,4 +138,4 @@ class App {
   }
 }
 
-new App();
+const app = new App();
