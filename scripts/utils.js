@@ -1,4 +1,50 @@
-const csv = text => text.split('\n').map(line => line.split(','));
+const csv = strData => {
+  const strDelimiter = ",";
+
+  // Create a regular expression to parse the CSV values.
+  const objPattern = new RegExp(
+    (
+      // Delimiters.
+      "(\\" + strDelimiter + "|\\r?\\n|\\r|^)" +
+
+      // Quoted fields.
+      "(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|" +
+
+      // Standard fields.
+      "([^\"\\" + strDelimiter + "\\r\\n]*))"
+    ),
+    "gi"
+  );
+
+  const arrData = [[]];
+  let arrMatches = null;
+
+  while (arrMatches = objPattern.exec(strData)) {
+    var strMatchedDelimiter = arrMatches[1];
+    if (
+      strMatchedDelimiter.length &&
+      strMatchedDelimiter !== strDelimiter
+    ) {
+      arrData.push([]);
+    }
+
+    var strMatchedValue;
+
+    if (arrMatches[2]) {
+
+      strMatchedValue = arrMatches[2].replace(
+        new RegExp("\"\"", "g"),
+        "\""
+      );
+
+    } else {
+      strMatchedValue = arrMatches[3];
+    }
+    arrData[arrData.length - 1].push(strMatchedValue);
+  }
+
+  return arrData;
+}
 
 const formatSnakeCase = text => {
   let formattedText = text.replace(/_/g, ' ');
@@ -24,7 +70,7 @@ const loadAllData = () => Promise.all([
     return {
       leaderboard,
       globalDeaths: globalDeaths.map(r => r[0] === 'WORLD' ? ['World', ...r.slice(1)] : r),
-      places: globalDeaths.map(r => r[0] === 'WORLD' ? 'World' : r[0]).slice(1).sort()
+      places: globalDeaths.map(r => r[0] === 'WORLD' ? 'World' : r[0]).slice(1).sort().filter((r, index, arr) => arr.indexOf(r) === index)
     }
   })
 });
@@ -42,6 +88,7 @@ const getLeaderboardEntries = (leaderboardKeys) => {
   return leaderboardKeys
     .map(key => ({
       id: key,
+      isActive: data.activeLeaderboard.includes(key),
       ...data.leaderboard[key]
     }))
     .sort((a, b) => {
@@ -55,11 +102,6 @@ const getLeaderboardEntries = (leaderboardKeys) => {
     })
 }
 
-const render = () => {
-  renderLeaderboard();
-  plotChat();
-}
-
 const getOptions = () => {
   const placeInput = document.querySelector(selectors.placeInput);
   const placeOption = placeInput.options[placeInput.selectedIndex];
@@ -69,3 +111,6 @@ const getOptions = () => {
     dydx: document.querySelector(selectors.dydxOptionInput).checked
   }
 }
+
+const colorway = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b, #e377c2', '#7f7f7f', '#bcbd22', '#17becf']
+
