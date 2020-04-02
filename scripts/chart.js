@@ -33,7 +33,10 @@ class Chart {
         x: this.app.data.globalDeaths.dates,
         y: this.app.data.globalDeaths[place],
         name: 'WHO Report',
-        mode: 'lines+markers'
+        mode: 'lines+markers',
+        line: {
+          color: '#000000'
+        }
       }
     ];
 

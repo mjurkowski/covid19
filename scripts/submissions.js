@@ -37,22 +37,19 @@ class Submissions {
   };
 
   getSubmissionEntriesToTrace = () => {
-    const submissions = [];
-
-    if (this.active.length) {
-      submissions.push(...this.active);
-    } else {
-      submissions.push(...this.getFilteredKeysByPlace().slice(0, 3));
-    }
-
-    return this.getEntriesByKeys(submissions);
+    return this.getEntriesByKeys(this.getSubmissionKeysToTrace());
   };
 
+  getSubmissionKeysToTrace = () => {
+    if (this.active.length) {
+      return this.active;
+    } 
+    return this.getFilteredKeysByPlace().slice(0, 3);
+  }
+
   render = () => {
-    const entries = this.getEntriesByKeys(this.getFilteredKeysByPlace()).slice(
-      0,
-      5
-    );
+    const entries = this.getEntriesByKeys(this.getFilteredKeysByPlace())
+      .slice(0,5);
     const container = document.querySelector(this.selector);
 
     // Cleanup listeners
@@ -62,20 +59,19 @@ class Submissions {
 
     const disableKeys = ['id', 'isActive', 'color'];
 
+    const tracedKeys = this.getSubmissionKeysToTrace();
+
     entries.forEach((entry, index, arr) => {
       const dataKeys = Object.keys(entry).filter(
         key => typeof entry[key] !== 'object' && !disableKeys.includes(key)
       );
       const isActive = this.active.includes(entry.id);
+      const isTraced = tracedKeys.includes(entry.id);
       container.innerHTML += `
         <div class="list-group-item list-group-item-action ${
           isActive ? 'active' : ''
         }" style="word-break: break-all;" data-id="${entry.id}">
-          ${
-            isActive
-              ? `<div class="color-circle" style="background-color: ${entry.color}"></div>`
-              : ''
-          }
+          ${isTraced ? `<div class="color-circle" style="background-color: ${entry.color}"></div>` : ''}
           <div class="d-flex w-100 justify-content-between">
             <p class="mb-1">${entry.id}</p>
           </div>
