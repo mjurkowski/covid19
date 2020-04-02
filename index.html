@@ -28,17 +28,28 @@
         </div>
       </div>
     </nav>
-    <div class="row">
+    <div class="row mb-5">
       <div class="col-12 col-md-4">
         <div class="list-group submissions"></div>
       </div>
       <div class="col-12 col-md-8" id="chart" style="height: 500px;"></div>
     </div>
+    <div class="map-navigation">
+      <div>
+        <h3 class="text-center"></h3>
+      </div>
+      <div><input type="range" id="mapIndexSelector" step="1" style="width: 100%;"/></div>
+      <div>
+        <button id="play" class="btn btn-primary">Play</button>
+      </div>
+    </div>
+    <div id="map" class="mb-5" style="height: 500px;"></div>
   </div>
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   <script src="./scripts/utils.js"></script>
   <script src="./scripts/chart.js"></script>
   <script src="./scripts/submissions.js"></script>
+  <script src="./scripts/map.js"></script>
   <script src="./scripts/app.js"></script>
 </body>
 </html>

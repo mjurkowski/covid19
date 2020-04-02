@@ -1,7 +1,7 @@
 class App {
   data = {
     places: [],
-    globalDeaths: []
+    globalDeaths: {}
   };
   defaultSelectedPlace = 'World';
   selectors = {
@@ -36,6 +36,7 @@ class App {
 
     this.submissions = new Submissions(this, data.submissions);
     this.chart = new Chart(this, this.submissions);
+    this.map = new Map(this);
 
     this.renderPlaces();
     this.render();
@@ -47,7 +48,7 @@ class App {
       fetch('./time_series_covid19_deaths_global.csv')
         .then(response => response.text())
         .then(csv)
-    ]).then(([submissions, globalDeaths]) => {
+    ]).then(([submissions, rawGlobalDeaths]) => {
       return Promise.all(
         Object.keys(submissions).map(key =>
           fetch(`./predictions_challenge/${key}/predictions.csv`)
@@ -60,16 +61,35 @@ class App {
           submissions[key].predictions = responses[index].splice(1);
         });
 
+        const globalDeaths = rawGlobalDeaths.reduce((acc, row, index) => {
+          if (index === 0) {
+            acc.dates = row.slice(3).map(c => new Date(c))
+          } else {
+            let place = row[0];
+            if (place === 'WORLD') {
+              place = 'World';
+            }
+
+            let data = row.slice(3).map(c => parseFloat(c));
+
+            if (acc.locations[place]) {
+              acc.locations[place].data = acc.locations[place].data.map((v, i) => v + (data[i] || 0))
+            } else {
+              acc.locations[place] = {
+                data,
+                lat: parseFloat(row[1]),
+                lon: parseFloat(row[2])
+              };
+            }
+          }
+
+          return acc;
+        }, { dates: [], locations: {}})
+
         return {
           submissions,
-          globalDeaths: globalDeaths.map(r =>
-            r[0] === 'WORLD' ? ['World', ...r.slice(1)] : r
-          ),
-          places: globalDeaths
-            .map(r => (r[0] === 'WORLD' ? 'World' : r[0]))
-            .slice(1)
-            .sort()
-            .filter((r, index, arr) => arr.indexOf(r) === index)
+          globalDeaths,
+          places: Object.keys(globalDeaths.locations).sort()
         };
       });
     });
@@ -121,4 +141,4 @@ class App {
   }
 }
 
-new App();
+const app = new App();

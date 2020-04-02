@@ -30,13 +30,13 @@ class Chart {
     const result = [
       ...predictions,
       {
-        x: this.app.data.globalDeaths[0].slice(3).map(r => new Date(r)),
-        y: this.app.data.globalDeaths
-          .find(r => r[0] === place)
-          .slice(3)
-          .map(r => parseFloat(r)),
+        x: this.app.data.globalDeaths.dates,
+        y: this.app.data.globalDeaths.locations[place].data,
         name: 'WHO Report',
-        mode: 'lines+markers'
+        mode: 'lines+markers',
+        line: {
+          color: '#000000'
+        }
       }
     ];
 
