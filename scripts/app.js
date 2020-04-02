@@ -1,7 +1,7 @@
 class App {
   data = {
     places: [],
-    globalDeaths: []
+    globalDeaths: {}
   };
   defaultSelectedPlace = 'World';
   selectors = {
@@ -36,6 +36,7 @@ class App {
 
     this.submissions = new Submissions(this, data.submissions);
     this.chart = new Chart(this, this.submissions);
+    this.map = new Map(this);
 
     this.renderPlaces();
     this.render();
@@ -71,22 +72,24 @@ class App {
 
             let data = row.slice(3).map(c => parseFloat(c));
 
-            if (acc[place]) {
-              acc[place] = acc[place].map((v, i) => v + (data[i] || 0))
+            if (acc.locations[place]) {
+              acc.locations[place].data = acc.locations[place].data.map((v, i) => v + (data[i] || 0))
             } else {
-              acc[place] = data;
+              acc.locations[place] = {
+                data,
+                lat: parseFloat(row[1]),
+                lon: parseFloat(row[2])
+              };
             }
           }
 
           return acc;
-        }, {})
+        }, { dates: [], locations: {}})
 
         return {
           submissions,
           globalDeaths,
-          places: Object.keys(globalDeaths)
-            .sort()
-            .filter(r => r !== 'dates')
+          places: Object.keys(globalDeaths.locations).sort()
         };
       });
     });

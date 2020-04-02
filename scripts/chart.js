@@ -31,7 +31,7 @@ class Chart {
       ...predictions,
       {
         x: this.app.data.globalDeaths.dates,
-        y: this.app.data.globalDeaths[place],
+        y: this.app.data.globalDeaths.locations[place].data,
         name: 'WHO Report',
         mode: 'lines+markers',
         line: {
