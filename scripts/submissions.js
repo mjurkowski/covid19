@@ -42,13 +42,11 @@ class Submissions {
     if (this.active.length) {
       submissions.push(...this.active);
     } else {
-      submissions.push(
-        ...this.getFilteredKeysByPlace().slice(0, 3)
-      );
+      submissions.push(...this.getFilteredKeysByPlace().slice(0, 3));
     }
 
     return this.getEntriesByKeys(submissions);
-  }
+  };
 
   render = () => {
     const entries = this.getEntriesByKeys(this.getFilteredKeysByPlace()).slice(
@@ -63,7 +61,6 @@ class Submissions {
     container.innerHTML = '';
 
     const disableKeys = ['id', 'isActive', 'color'];
-
 
     entries.forEach((entry, index, arr) => {
       const dataKeys = Object.keys(entry).filter(

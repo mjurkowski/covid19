@@ -9,7 +9,8 @@ class Chart {
   getChartTraces = () => {
     const { place, dydx } = this.app.options;
 
-    const predictions = this.submissions.getSubmissionEntriesToTrace()
+    const predictions = this.submissions
+      .getSubmissionEntriesToTrace()
       .map(entry => {
         const filteredPredictions = entry.predictions.filter(
           r => r[2] === place
